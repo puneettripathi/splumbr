@@ -24,11 +24,10 @@ class SparkApplication:
         Function to provide spark session.
         :return: spark: SparkSession
         """
-        os.environ['HADOOP_HOME'] = 'C:\WinUtils'
+        # os.environ['HADOOP_HOME'] = 'C:\WinUtils'
         spark = SparkSession \
             .builder \
-            .appName("Python Spark SQL basic example") \
-            .config("spark.some.config.option", "some-value") \
+            .appName("SparkETL") \
             .getOrCreate()
         return spark
 
