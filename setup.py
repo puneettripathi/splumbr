@@ -3,11 +3,10 @@ from setuptools import setup
 setup(
     name='SparkETL',
     version='0.1',
-    packages=['', 'Extract'],
-    package_dir={'': 'spark_etl'},
+    packages=['spark_etl', 'spark_etl.Extract'],
     url='',
     license='',
     author='Puneet Tripathi',
     author_email='puneet.tripathim@gmail.com',
-    description='ETL on Apache Spark in python'
+    description='Library for ETL on Apache Spark in python'
 )
