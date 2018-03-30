@@ -1,2 +1,8 @@
 venv/*
 .idea/*
+spark_etl/__pycache__
+spark_etl/__pycache__/*
+SparkETL.egg-info
+SparkETL.egg-info/*
+build/*
+dist/*
