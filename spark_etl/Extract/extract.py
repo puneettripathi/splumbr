@@ -8,7 +8,7 @@ import os
 from spark_etl.spark_session import SparkApplication
 
 
-class Base(SparkApplication):
+class Extract(SparkApplication):
     """
     Class to provide all functionalities to Extract Data from various sources.
        -- CSVs & other delimited files
@@ -19,6 +19,7 @@ class Base(SparkApplication):
        -- Hive tables
        -- DBs
     Only Zips files are read and returned as RDD while all others return DataFrame
+    Avro needs to use datadricks-avro jar
     """
     def __init__(self,
                  source=None,
@@ -89,8 +90,29 @@ class Base(SparkApplication):
         """
         rdd = self.sc.binaryFiles(self.source_path)
         data_rdd = rdd.flatMap(
-            lambda x: Base.zip_extract(x)).map(
+            lambda x: Extract.zip_extract(x)).map(
             lambda x: x[1]).flatMap(
             lambda s: s.split("\n")).map(
             lambda x: x.split(dlm))
         return data_rdd
+
+    def read_parquet_files(self, **kwargs):
+        """
+        Reads Parquet files in a Dataframe
+
+        :param kwargs:
+        :return:
+        """
+        df = self.spark.read.parquet(self.source_path, **kwargs)
+        return df
+
+    def read_avro_files(self, **kwargs):
+        """
+        Funtion to read Avro files to Spark. Spark doesn't yet fully support Avro file format. It needs to use daatabricks-avro Jar.
+        This is not a very neat implementation but it does solve the problem.
+
+        :param kwargs:
+        :return: dataframe
+        """
+        df = self.spark.read.format("com.databricks.spark.avro").load(self.source_path, **kwargs)
+        return df
