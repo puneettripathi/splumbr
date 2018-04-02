@@ -1,6 +1,5 @@
 import logging
 
-
 logging.basicConfig(format='%(asctime)s %(levelname)s %(name)s:%(filename)s: %(message)s',
 level=logging.INFO,
 datefmt='%Y-%m-%d %H:%M:%S')
