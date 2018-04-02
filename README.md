@@ -9,7 +9,10 @@
 * Fixed length record files
 * ZIP files which contains delimited text files
 * Avro | dependency - databricks-avro jar
+* Parquet
+* Hive Tables
 
 ### Transformation
 #### CDC to capture changes in dimension. Performs Upsert, doesn't support delete of records.
+   <i>-- More like SCD I</i>
 #### Transformer - applies tranformation on columns
