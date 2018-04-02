@@ -116,3 +116,54 @@ class Extract(SparkApplication):
         """
         df = self.spark.read.format("com.databricks.spark.avro").load(self.source_path, **kwargs)
         return df
+
+    def read_hive_table(self,
+                        database,
+                        table_name,
+                        column_list=None,
+                        partition_scan=None,
+                        filter_conditions=None,
+                        custom_sql=None):
+        """
+        Reads data from Hive table and load the data to a Spark dataframe.
+
+        :param database: Name of the Hive Database
+        :param table_name: Name of the table to fetch rows from
+        :param column_list: Default "*", else the columns to select from table
+        :param partition_scan: Partition Scan allows you to specify a list of (k,v) pair --> [(partition_column, partition_value)]
+        :param filter_conditions: Filter condition to select data from table, must be string like "class = 5 and marks >= 70"
+        :return: df - Spark Dataframe
+        """
+        if column_list is None or len(column_list) == 0:
+            sql_stmt = "select * from " + database + "." + table_name + " where 1=1"
+        else:
+            sql_stmt = "select " + ", ".join(column_list) + " from " + database + "." + table_name + " where 1=1"
+
+        if filter_conditions is not None:
+            sql_stmt = sql_stmt + " and " + filter_conditions
+
+        if partition_scan is not None and len(partition_scan) > 0:
+            partition_stmt = "and " + " and ".join([i[0] + "=" + str(i[1])
+                                                    if type(i[1]) in (str, int, float)
+                                                    else i[0] + " in " + "(" + ", ".join(map(str, i[1])) + ")"
+                                                    for i in partition_scan])
+
+            sql_stmt = sql_stmt + partition_stmt
+
+        if custom_sql is not None:
+            df = self.spark.sql(custom_sql)
+        else:
+            df = self.spark.sql(sql_stmt)
+
+        return df
+
+    def read_db_table(self,
+                      db_type,
+                      ):
+        """
+        This function reads data from RDBMS table and returns a Spark dataframe
+         ---- Not implemented yet ----
+
+        :return:
+        """
+        raise NotImplementedError
