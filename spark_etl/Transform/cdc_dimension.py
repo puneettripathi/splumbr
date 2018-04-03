@@ -48,9 +48,10 @@ class CDCDimension(SparkApplication):
 
     def _get_data(self, src_data):
         """
+        Reads data from parquet files to Spark dataframe.
 
         :param src_data:
-        :return:
+        :return: pyspark.sql.dataframe.DataFrame
         """
         return self.spark.read.parquet(src_data)
 
@@ -73,7 +74,7 @@ class CDCDimension(SparkApplication):
         """
         Function capture rows that didn't change in source and change dataframes.
 
-        :return:
+        :return: pyspark.sql.dataframe.DataFrame
         """
         if self.key in self.source_df.columns and self.key in self.change_df.columns:
             _no_change = self.source_df.alias("a"
@@ -86,10 +87,11 @@ class CDCDimension(SparkApplication):
             logger.error("change capture key is not in the source or change df")
         return _no_change
 
-    def _insert(self):
+    def _new_records(self):
         """
+        Create rows that are new records and must be inserted for CDC.
 
-        :return:
+        :return: pyspark.sql.dataframe.DataFrame
         """
         if self.key in self.source_df.columns and self.key in self.change_df.columns:
             _insert = self.change_df.alias("a"
@@ -102,10 +104,11 @@ class CDCDimension(SparkApplication):
             logger.error("change capture key is not in the source or change df")
         return _insert
 
-    def _update(self):
+    def _update_records(self):
         """
+        Creates dataframe that captures the updated records.
 
-        :return:
+        :return: pyspark.sql.dataframe.DataFrame
         """
         if self.key in self.source_df.columns and self.key in self.change_df.columns:
             _update = self.change_df.alias("a"
@@ -118,10 +121,11 @@ class CDCDimension(SparkApplication):
 
     def change_captured(self):
         """
+        Captures the change in new dimension dataframe and old dimension dataframe
 
-        :return:
+        :return: pyspark.sql.dataframe.DataFrame
         """
-        update_recs = self._update()
-        insert_recs = self._insert()
+        update_recs = self._update_records()
+        new_recs = self._new_records()
         no_change_recs = self._no_change()
-        return no_change_recs.unionAll(insert_recs).unionAll(update_recs)
+        return no_change_recs.unionAll(new_recs).unionAll(update_recs)
