@@ -1,6 +1,10 @@
+"""
+Base Package for applying tranformations to the dataframe.
+"""
+
 from spark_etl import logger
 from spark_etl.spark_session import SparkApplication
-from pyspark.sql.functions import lit
+from pyspark.sql.functions import lit, udf, col
 
 
 class Transformer(SparkApplication):
@@ -8,7 +12,7 @@ class Transformer(SparkApplication):
     Applies basic transformations on input dataframe. Basic tranformations involve
       - derived columns
       - datatype change
-      - drop multiple columns
+      - drop/keep (multiple) columns
       - checkpointing dataframe to break lineage
       - treat outliers
       - handle missing values
@@ -58,7 +62,21 @@ class Transformer(SparkApplication):
         :param column_list:
         :return:
         """
-        self.df.drop(*column_list)
+        assert isinstance(column_list, (str,list)), "Error: column_list must be either list or string"
+        if isinstance(column_list, list):
+            self.df.drop(*column_list)
+        else:
+            self.df.drop(column_list)
+
+    def keep_columns(self, column_list=None):
+        """
+        Drops the list of columns provided
+        :param column_list:
+        :return:
+        """
+        assert isinstance(column_list, list), "ERROR: arguement column_list must be a list."
+        if isinstance(column_list, list):
+            self.df.select(*column_list)
 
     def change_column_datatype(self,
                                column_name=None,
@@ -84,3 +102,36 @@ class Transformer(SparkApplication):
                                          "cast(" + column_name + " as " + new_data_type)
         else:
             logger.error("change_column_datatype must take either column_dtype_dict or both column_name and new_data_type")
+
+    def show(self, n=20):
+        """
+        Shows 20 rows from dataframe.
+        """
+        self.df.show(n=n,
+                     truncate=True)
+
+    @property
+    def df(self):
+        """
+        The dataframe being transformed(as is).
+
+        :return: df
+        """
+        return self.df
+
+    def apply_udf_to_str_cols(self, column_list, func, returnType):
+        """
+        Applies the User Defined Funtion to the string type columns in the Input dataframe.
+
+        :param column_list: List of columns to tranform
+        :param func: UserDefinedFunction to apply to columnns
+        :param returnType: Return type of UDF
+        ## This function is not well tested.
+        """
+        # https://stackoverflow.com/questions/34037889/apply-same-function-to-all-fields-of-spark-dataframe-row
+        assert set(column_list).issubset(self.df.columns), "ERROR: Column List provided is not in DataFrame columns."
+        columns_to_use = [x[0] for x in self.df.dtypes if x[1] == 'string']
+        assert set(column_list).issubset(set(columns_to_use)), "ERROR: Columns in column_list are not string."
+
+        fx = udf(func, returnType)
+        self.df = self.df.select(*[fx(col(c)).alias(c) for c in self.df.columns])
