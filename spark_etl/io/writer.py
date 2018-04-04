@@ -16,7 +16,7 @@ class Writer(SparkApplication):
            -- ORC
            -- Avro - Needs databricks-avro jar to load data to avro format.
            -- Hive tables
-           -- DBs
+           -- DBs - Not Supported yet
     Only Zips files are read and returned as RDD while all others return DataFrame
     Avro needs to use datadricks-avro jar
     """
@@ -150,3 +150,6 @@ class Writer(SparkApplication):
                 df.write.insertInto(table_name,
                                     overwrite=True)
         logger.info("Write Complete.")
+
+    def write_to_db(self):
+        raise NotImplementedError
