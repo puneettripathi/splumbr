@@ -10,7 +10,7 @@ from spark_etl.spark_session import SparkApplication
 
 class Extract(SparkApplication):
     """
-    Class to provide all functionalities to Extract Data from various sources.
+    Class to provide all functionalities to io Data from various sources.
        -- CSVs & other delimited files
        -- Fixed Length Files
        -- Parquets

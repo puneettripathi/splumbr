@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='SparkETL',
     version='0.1',
-    packages=['spark_etl', 'spark_etl.Extract'],
+    packages=['spark_etl', 'spark_etl.io'],
     url='',
     license='',
     author='Puneet Tripathi',
