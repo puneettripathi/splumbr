@@ -16,3 +16,5 @@
 #### CDC to capture changes in dimension. Performs Upsert, doesn't support delete of records.
    <i>-- More like SCD I</i>
 #### Transformer - applies tranformation on columns
+
+
