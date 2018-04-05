@@ -1,8 +1,8 @@
 # SparkETL
+##### SparkETL is a library for performing ETL on Apache Spark using python.
+##### It provides with tools to Read Data from various sources, Apply Transformations on the data read and then load them to the destination.
 
-### Extract
-#### SparkETL is a library for performing ETL on Apache Spark using python.
-#### It provides with tools to Read Data from various sources, Apply Transformations on the data read and then load them to the destination.
+### io
 #### It Currently can read -
 * Delimited Files
 * JSONS
@@ -11,10 +11,27 @@
 * Avro | dependency - databricks-avro jar
 * Parquet
 * Hive Tables
+#### It Currently can write to -
+* Delimited Files
+* JSONs
+* Avro | dependency - databricks-avro jar
+* ORC
+* Parquet
+* Hive Tables
+
+##### It handles mismatch in schema of Hive tables while writing out of the box.
 
 ### Transformation
-#### CDC to capture changes in dimension. Performs Upsert, doesn't support delete of records.
-   <i>-- More like SCD I</i>
+#### CDC to capture changes in dimension. 
+* Performs Upsert
+* doesn't support delete of records.
+*  <i>-- More like SCD I</i>
+
 #### Transformer - applies tranformation on columns
+* apply udf to all string columns
+* single columns transformations
+* drop multiple columns
+* keep columns
+
 
 
