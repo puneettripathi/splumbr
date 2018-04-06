@@ -22,7 +22,7 @@ class Transformer(SparkApplication):
     def __init__(self,
                  source_data):
         """
-        Tranfformer Constructor takes dataframe as input and applies transformations to it.
+        Transformer Constructor takes dataframe as input and applies transformations to it.
 
         :param source_data:
         """
@@ -62,21 +62,24 @@ class Transformer(SparkApplication):
         :param column_list:
         :return:
         """
+        if isinstance(column_list, str):
+            column_list = column_list.split(",")
+
         assert isinstance(column_list, (str,list)), "Error: column_list must be either list or string"
-        if isinstance(column_list, list):
-            self.df.drop(*column_list)
-        else:
-            self.df.drop(column_list)
+        self.df.drop(*column_list)
 
     def keep_columns(self, column_list=None):
         """
-        Drops the list of columns provided
+        Keeps only the list of columns provided
+
         :param column_list:
         :return:
         """
+        if isinstance(column_list, str):
+            column_list = column_list.split(",")
+
         assert isinstance(column_list, list), "ERROR: arguement column_list must be a list."
-        if isinstance(column_list, list):
-            self.df.select(*column_list)
+        self.df.select(*column_list)
 
     def change_column_datatype(self,
                                column_name=None,
