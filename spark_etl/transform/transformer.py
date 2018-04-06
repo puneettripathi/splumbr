@@ -19,13 +19,14 @@ class Transformer(SparkApplication):
       - missing value imputations
 
     """
-    def __init__(self,
-                 source_data):
+
+    def __init__(self, source_data):
         """
         Transformer Constructor takes dataframe as input and applies transformations to it.
 
         :param source_data:
         """
+        super().__init__()
         self.df = source_data
 
     def add_derived_column(self,
@@ -44,7 +45,7 @@ class Transformer(SparkApplication):
             expression = lit(expression)
         else:
             expression = expression
-        self.df = self.df.withColumn(col_name,expression)
+        self.df = self.df.withColumn(col_name, expression)
 
     def check_point(self):
         """
@@ -65,7 +66,7 @@ class Transformer(SparkApplication):
         if isinstance(column_list, str):
             column_list = column_list.split(",")
 
-        assert isinstance(column_list, (str,list)), "Error: column_list must be either list or string"
+        assert isinstance(column_list, (str, list)), "Error: column_list must be either list or string"
         self.df.drop(*column_list)
 
     def keep_columns(self, column_list=None):
@@ -104,7 +105,8 @@ class Transformer(SparkApplication):
             self.df = self.df.selectExpr(*_columns,
                                          "cast(" + column_name + " as " + new_data_type)
         else:
-            logger.error("change_column_datatype must take either column_dtype_dict or both column_name and new_data_type")
+            logger.error(
+                "change_column_datatype must take either column_dtype_dict or both column_name and new_data_type")
 
     def show(self, n=20):
         """
@@ -138,3 +140,39 @@ class Transformer(SparkApplication):
 
         fx = udf(func, returnType)
         self.df = self.df.select(*[fx(col(c)).alias(c) for c in self.df.columns])
+
+    def detect_outlier_cutoffs(self, column, quantiles_points=(0.20, 0.80), range_cutoff=1.5):
+        """
+
+        :param column:
+        :param quantiles_points:
+        :param range_cutoff:
+        :return:
+        """
+        quantiles = self.df.stat.approxQuantiles(column,
+                                                 quantiles_points,
+                                                 0.0)
+        iqr = quantiles[1] - quantiles[0]
+        return quantiles[0] - range_cutoff * iqr, quantiles[1] + range_cutoff * iqr
+
+    def remove_outlier(self, column, **kwargs):
+        """
+
+        :param column:
+        :param kwargs:
+        :return:
+        """
+        cutoff_outlier = self.detect_outlier_cutoffs(column, **kwargs)
+        self.df.filter(column + " < " + str(cutoff_outlier[0]) + " or " + column + " > " + str(cutoff_outlier[1]))
+
+    def handle_missing_values(self, column_list):
+        """
+
+        :param column_list:
+        :return:
+        """
+        pass
+
+    @df.setter
+    def df(self, value):
+        self.df = value
