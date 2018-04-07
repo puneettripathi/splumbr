@@ -32,5 +32,6 @@
 * single columns transformations
 * drop multiple columns
 * keep columns
+* outlier detection and handling
 
 <b> It is a work in progress </b>
