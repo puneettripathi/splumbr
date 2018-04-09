@@ -5,6 +5,7 @@ Base Package for applying tranformations to the dataframe.
 from spark_etl import logger
 from spark_etl.spark_session import SparkApplication
 from pyspark.sql.functions import lit, udf, col
+from functools import reduce
 
 
 class Transformer(SparkApplication):
@@ -149,9 +150,9 @@ class Transformer(SparkApplication):
         :param range_cutoff:
         :return:
         """
-        quantiles = self.df.stat.approxQuantiles(column,
-                                                 quantiles_points,
-                                                 0.0)
+        quantiles = self.df.approxQuantiles(column,
+                                            quantiles_points,
+                                            0.0)
         iqr = quantiles[1] - quantiles[0]
         return quantiles[0] - range_cutoff * iqr, quantiles[1] + range_cutoff * iqr
 
@@ -165,13 +166,54 @@ class Transformer(SparkApplication):
         cutoff_outlier = self.detect_outlier_cutoffs(column, **kwargs)
         self.df.filter(column + " < " + str(cutoff_outlier[0]) + " or " + column + " > " + str(cutoff_outlier[1]))
 
-    def handle_missing_values(self, column_list):
+    def handle_missing_values(self, column_list, strategy=None, value=None):
         """
+        Imputes the missing values in a dataframe in column list provided by the user.
 
-        :param column_list:
-        :return:
+        :param column_list: list of columns to be imputed
+        :param strategy: mean, median, mode - for only numeric columns
+        :param value: sets a constant value for all variables in column list - works for both String and Numeric columns.
         """
-        pass
+        col_fill = None
+        if isinstance(column_list, str):
+            column_list = [column_list]
+        else:
+            column_list = column_list
+        assert isinstance(column_list, list), "ERROR: column must be a list or string"
+
+        if value is not None:
+            logger.warn("value is provided ignoring strategy.")
+            col_fill = {column: value for column in column_list}
+        elif strategy.lower() in ('mean', 'median', 'mode'):
+            assert len(column_list) == len(
+                [tpl
+                 for tpl in self.df.select(*column_list).dtypes
+                 if tpl[1] in ('int', 'bigint', 'double', 'long')
+                 ]),\
+                "ERROR: column_list contains invalid datatype valid datatypes are int, bigint, double, long"
+            if strategy.lower() == 'medeian':
+                col_fill = {column: self.df.approxQuantile(column, [0.5], 0.25) for column in column_list}
+            elif strategy.lower() == 'mean':
+                _mean_dict = {column: 'mean' for column in column_list}
+                _mean_values = self.df.agg(_mean_dict).collect()[0].asDict()
+                col_fill = {k[4:-1]: v for k, v in _mean_values.iteritems()}
+            else:
+                mode = reduce(
+                    lambda a, b: a.join(b, "id"),
+                    [
+                        self.df.groupBy(column).count().sort(col("count").desc()).limit(1).select(
+                            lit(1).alias("id"),
+                            col(column).alias(column)
+                        )
+                        for column in column_list
+                    ]
+                )
+                col_fill = mode.drop("id").collect()[0].asDict()
+        else:
+            logger.error("either provide value or a strategy for filling missing values")
+
+        if col_fill is not None:
+            self.df = self.df.na.fill(col_fill)
 
     @df.setter
     def df(self, value):
