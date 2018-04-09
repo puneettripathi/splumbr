@@ -168,11 +168,13 @@ class Transformer(SparkApplication):
 
     def handle_missing_values(self, column_list, strategy=None, value=None):
         """
+        Imputes the missing values in a dataframe in column list provided by the user.
 
-        :param column_list:
-        :param strategy:
-        :return:
+        :param column_list: list of columns to be imputed
+        :param strategy: mean, median, mode - for only numeric columns
+        :param value: sets a constant value for all variables in column list - works for both String and Numeric columns.
         """
+        col_fill = None
         if isinstance(column_list, str):
             column_list = [column_list]
         else:
@@ -192,7 +194,7 @@ class Transformer(SparkApplication):
             if strategy.lower() == 'medeian':
                 col_fill = {column: self.df.approxQuantile(column, [0.5], 0.25) for column in column_list}
             elif strategy.lower() == 'mean':
-                _mean_dict = {col: 'mean' for col in column_list}
+                _mean_dict = {column: 'mean' for column in column_list}
                 _mean_values = self.df.agg(_mean_dict).collect()[0].asDict()
                 col_fill = {k[4:-1]: v for k, v in _mean_values.iteritems()}
             else:
@@ -210,7 +212,8 @@ class Transformer(SparkApplication):
         else:
             logger.error("either provide value or a strategy for filling missing values")
 
-        self.df = self.df.na.fill(col_fill)
+        if col_fill is not None:
+            self.df = self.df.na.fill(col_fill)
 
     @df.setter
     def df(self, value):
