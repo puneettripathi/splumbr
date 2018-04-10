@@ -194,7 +194,7 @@ class Transformer(SparkApplication):
             if strategy.lower() == 'medeian':
                 col_fill = {column: self.df.approxQuantile(column, [0.5], 0.25) for column in column_list}
             elif strategy.lower() == 'mean':
-                _mean_dict = {column: 'mean' for column in column_list}
+                _mean_dict = {column: 'avg' for column in column_list}
                 _mean_values = self.df.agg(_mean_dict).collect()[0].asDict()
                 col_fill = {k[4:-1]: v for k, v in _mean_values.iteritems()}
             else:
