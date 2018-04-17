@@ -33,5 +33,10 @@
 * drop multiple columns
 * keep columns
 * outlier detection and handling
+* missing value imputation with - mean, meadian, mode, constant
+
+#### Quality Assuarance
+* Report on all columns
+* comparison of data in two dataframes
 
 <b> It is a work in progress </b>
