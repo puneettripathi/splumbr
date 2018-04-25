@@ -2,8 +2,8 @@
 Class for all things Loader for ETL on Spark & Python
 """
 
-from spark_etl import logger
-from spark_etl.spark_session import SparkApplication
+from splumbr import logger
+from splumbr.spark_session import SparkApplication
 from pyspark.sql.functions import lit
 
 

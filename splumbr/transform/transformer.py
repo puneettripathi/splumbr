@@ -2,8 +2,8 @@
 Base Package for applying tranformations to the dataframe.
 """
 
-from spark_etl import logger
-from spark_etl.spark_session import SparkApplication
+from splumbr import logger
+from splumbr.spark_session import SparkApplication
 from pyspark.sql.functions import lit, udf, col
 from functools import reduce
 
