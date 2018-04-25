@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='SparkETL',
     version='0.1',
-    packages=['spark_etl', 'spark_etl.io', 'spark_etl.qa', 'spark_etl.pipeline'],
+    packages=['splumbr', 'splumbr.io', 'splumbr.qa', 'splumbr.pipeline'],
     url='',
     license='',
     author='Puneet Tripathi',

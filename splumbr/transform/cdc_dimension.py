@@ -1,8 +1,8 @@
 """
 Change Data Capture ~ SCD Type 1 ~ UpSert
 """
-from spark_etl import logger
-from spark_etl.spark_session import SparkApplication
+from splumbr import logger
+from splumbr.spark_session import SparkApplication
 from pyspark.sql.functions import concat
 
 

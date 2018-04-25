@@ -5,7 +5,7 @@ Class for all things Reader for ETL on Spark & Python
 import io
 import zipfile
 import os
-from spark_etl.spark_session import SparkApplication
+from splumbr.spark_session import SparkApplication
 
 
 class Extract(SparkApplication):
