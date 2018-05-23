@@ -1,0 +1,17 @@
+{
+  "pipe_name": "SamplePipeline",
+  "read": {
+    "file_location": "path/to/file",
+    "delimiter": "|"
+  },
+  "transform":[
+
+  ],
+  "qa_read": [
+
+  ],
+  "qa_transform": [
+
+  ],
+  "pipe": ["read", "qa_read", "transform", "qa_transform"]
+}
