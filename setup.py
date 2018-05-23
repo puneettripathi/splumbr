@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name='SparkETL',
+    name='splumbr',
     version='0.1',
     packages=['splumbr', 'splumbr.io', 'splumbr.qa', 'splumbr.pipeline'],
     url='',

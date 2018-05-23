@@ -20,19 +20,21 @@ if __name__ == '__main__':
     args = parser.parse_args()
     python_path = args.python_path
     build_type = args.build_type
-    base_location = os.path.join(os.path.dirname(__file__))
-    print(base_location)
+    base_location = os.path.dirname(__file__)
+    print("base is -- " + base_location)
 
     if python_path:
         py_exec = python_path
     else:
-        py_exec = base_location + os.sep + "venv" + os.sep + "scripts" + os.sep + "python"
+        py_exec = "venv" + os.sep + "scripts" + os.sep + "python"
 
+    print(py_exec)
     if args.setup_py_location:
         setup = args.setup_py_location
     else:
-        setup = base_location + os.sep + 'setup.py'
+        setup = 'setup.py'
 
+    print(setup)
     os.system(py_exec + " " + setup + " build")
     os.system(py_exec + " " + setup + " sdist")
     os.system(py_exec + " " + setup + " bdist_egg")

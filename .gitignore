@@ -6,3 +6,4 @@ SparkETL.egg-info
 SparkETL.egg-info/*
 build/*
 dist/*
+splumbr.egg-info/*
