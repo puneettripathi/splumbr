@@ -34,8 +34,7 @@ class Report:
             self.column_list = self.df.columns
 
         return [colm for colm in self.column_list
-                               if colm in filter(lambda x: x[0] in self.type.get(type),
-                                                 dtypes)]
+                if colm in filter(lambda x: x[0] in self.type.get(type), dtypes)]
 
     def prepare_stat_params(self):
         """
