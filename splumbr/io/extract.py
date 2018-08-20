@@ -33,6 +33,7 @@ class Extract(SparkApplication):
         """
         self.source = source
         self.source_path = source_path
+        self.data = None
 
     def read_delimited_files(self, delimiter, **kwargs):
         """
